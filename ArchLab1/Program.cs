@@ -2,6 +2,8 @@
 using System.Security.Cryptography.X509Certificates;
 using ArchLab1.Holders;
 using ArchLab1.Model;
+using ArchLab1.View;
+using ArchLab1.Controller;
 using ArchLab1Lib.Model;
 
 namespace ArchLab1 // Note: actual namespace depends on the project name.

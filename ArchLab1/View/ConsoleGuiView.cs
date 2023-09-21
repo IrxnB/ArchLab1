@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace ArchLab1
+namespace ArchLab1.View
 {
     internal class ConsoleGuiView
     {
