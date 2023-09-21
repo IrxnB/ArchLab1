@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 
 namespace ArchLab1.Model
 {
-    internal interface Repository<E, K>
+    internal interface Repository<E, K> where E : IEntity<K>
     {
-        List<E> readAll();
-        E readById(K id);
-        void create(E entity);
-        void deleteById(K id);
+        List<E> ReadAll();
+        E? ReadById(K id);
+        void Create(E entity);
+        void DeleteById(K id);
+        bool ExistsById(K id);
+        void Update(E entity);
     }
 }
