@@ -1,13 +1,14 @@
 ﻿using ArchLab1.Holders;
 using ArchLab1.Model;
 using ArchLab1Lib.Model;
+using ArchLab1.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ArchLab1
+namespace ArchLab1.Controller
 {
     internal class CsvController
     {
