@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace ArchLab1Lib.Model
 {
-    public interface IEntity<K>
+    public interface IEntity<K, TSelf> where TSelf : IEntity<K, TSelf>
     {
         K Id { get; set; }
-        void Update(IEntity<K> newEntity);
+        void Update(TSelf newEntity) ;
     }
 }

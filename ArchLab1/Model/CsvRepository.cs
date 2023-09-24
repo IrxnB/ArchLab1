@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ArchLab1.Model
 {
-    internal class CsvRepository<E, K> : Repository<E, K> where E : IEntity<K>
+    internal class CsvRepository<E, K> : Repository<E, K> where E : IEntity<K, E>
     {
         private readonly String _csvPath;
 

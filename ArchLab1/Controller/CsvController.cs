@@ -96,18 +96,43 @@ namespace ArchLab1.Controller
 
         private TaskEntity ReadTaskFromConsole(out bool succeed)
         {
-            long id = ReadIdFromConsole(out succeed);
-            Console.WriteLine("Enter name:");
-            var name = Console.ReadLine();
-            return new TaskEntity(id, name);
+            bool idSucceed = false, nameSucceed = false, descSucceed = false, isCompleteSucceed = false;
+            long id = ReadIdFromConsole(out idSucceed);
+
+            _view.AskForField("name");
+            string? name = ReadStringFromConsole(out nameSucceed);
+
+            _view.AskForField("description");
+            string? description = ReadStringFromConsole(out descSucceed);
+
+            _view.AskForField("is created");
+            bool isComplete = ReadBoolFromConsole(out isCompleteSucceed);
+
+            succeed = idSucceed && nameSucceed && descSucceed && isCompleteSucceed;
+            return new TaskEntity(id, name, description, isComplete);
         }
         private long ReadIdFromConsole(out bool succeed)
         {
-            Console.WriteLine("Enter id:");
+            _view.AskForField("Id");
             long id;
             succeed = long.TryParse(Console.ReadLine(), out id);
             return id;
         }
+
+        private bool ReadBoolFromConsole(out bool succeed)
+        {
+            bool value;
+            succeed = bool.TryParse(Console.ReadLine(), out value);
+            return value;
+        }
+        private string? ReadStringFromConsole(out bool succeed)
+        {
+            succeed = true;
+            string? value = Console.ReadLine();
+            if (value == null) succeed = false;
+            return value;
+        }
+
 
     }
 }

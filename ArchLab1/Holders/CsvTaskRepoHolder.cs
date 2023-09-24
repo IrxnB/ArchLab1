@@ -1,13 +1,6 @@
 ﻿using System.Configuration;
-using System.Collections.Specialized;
 using ArchLab1.Model;
 using ArchLab1Lib.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CsvHelper.Configuration;
-using System.IO;
 
 namespace ArchLab1.Holders
 {
@@ -20,8 +13,7 @@ namespace ArchLab1.Holders
 
         private static CsvRepository<TaskEntity, long> createInstance()
         {
-            string path = (string)(ConfigurationManager.AppSettings.Get("csvUri") ?? throw new Exception());
-            Console.WriteLine(Path.GetExtension(path));
+            string path = (string)(ConfigurationManager.AppSettings.Get("csvPath") ?? throw new Exception());
             if (!Path.GetExtension(path).Equals(".csv")) throw new Exception("not csv");
             return new CsvRepository<TaskEntity, long>(path);
         }

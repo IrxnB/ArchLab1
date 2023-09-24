@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ArchLab1.Model
 {
-    internal interface Repository<E, K> where E : IEntity<K>
+    internal interface Repository<E, K> where E : IEntity<K, E>
     {
         List<E> ReadAll();
         E? ReadById(K id);

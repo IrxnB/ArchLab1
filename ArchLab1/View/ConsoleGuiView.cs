@@ -24,16 +24,17 @@ namespace ArchLab1.View
         public void DrawTask(TaskEntity? task)
         {
             if(task != null)
-                Console.WriteLine($"Task: Id={task.Id}, Name={task.Name}");
+                Console.WriteLine($"Task: Id={task.Id}, Name={task.Name}," +
+                    $" Desc={task.Description}, Completed={task.IsComplete}");
         }
 
         public void AskForCommand()
         {
             Console.WriteLine("Enter command Id:");
         }
-        public void AskForId()
+        public void AskForField(String fieldName)
         {
-            Console.WriteLine("Enter Id:");
+            Console.WriteLine($"Enter {fieldName}:");
         }
     }
 }
