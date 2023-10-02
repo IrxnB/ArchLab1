@@ -2,15 +2,17 @@
 
 namespace ArchLab1Lib.Model
 {
+    [Serializable]
     public class TaskEntity : IEntity<long, TaskEntity>
     {
+        public static TaskEntity Empty = new TaskEntity(-1, "", "", false);
         public long Id { get; set; }
 
         private string? name;
         private string? description;
         public bool IsComplete { get; set; }
 
-        public TaskEntity(long Id, string Name, string Description, bool IsComplete)
+        public TaskEntity(long Id, string Name = "", string Description = "", bool IsComplete = false)
         {
             this.Id = Id;
             this.name = Name;

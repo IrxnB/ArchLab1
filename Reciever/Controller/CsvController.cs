@@ -1,47 +1,35 @@
-﻿using ArchLab1.Holders;
-using ArchLab1.Model;
-using ArchLab1Lib.Model;
-using ArchLab1.View;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ArchLab1Lib.Model;
 using ArchLab1Lib;
+using Reciever.View;
 
-namespace ArchLab1.Controller
+namespace Client.Controller
 {
     internal class CsvController
     {
-        private readonly CsvRepository<TaskEntity, long> _repo;
-        private readonly ConsoleGuiView _view;
+        private readonly ClientView _view;
         private readonly List<Command> _commands;
 
-        public CsvController(CsvRepository<TaskEntity, long> repo, ConsoleGuiView view)
+        public CsvController(ClientView view)
         {
-            _repo = repo;
             _view = view;
             _commands = Enum.GetValues(typeof(Command))
                 .AsQueryable()
                 .Cast<Command>()
                 .ToList();
         }
-        public void ProcessCommand(Command command, out bool isExitCommand)
+        public Request ProcessCommand(Command command, out bool isExitCommand)
         {
             isExitCommand = false;
+            var req = new Request();
+            req.Command = command;
             switch (command)
             {
-                case Command.GetAll:
-                    {
-                        _view.DrawTasks(_repo.ReadAll());
-                        break;
-                    }
                 case Command.GetById:
                     {
                         bool succeed;
                         long id = ReadIdFromConsole(out succeed);
                         if(succeed){
-                            _view.DrawTask(_repo.ReadById(id));
+                            req.Body = new TaskEntity(id);
                         }
                         break;
                     }
@@ -49,9 +37,9 @@ namespace ArchLab1.Controller
                     {
                         bool isCreated = true;
                         TaskEntity fromConsole = ReadTaskFromConsole(out isCreated);
-                        if (isCreated && !_repo.ExistsById(fromConsole.Id))
+                        if (isCreated)
                         {
-                            _repo.Create(fromConsole);
+                            req.Body = fromConsole;
                         }
                         break;
                     }
@@ -59,9 +47,9 @@ namespace ArchLab1.Controller
                     {
                         bool isCreated = true;
                         TaskEntity fromConsole = ReadTaskFromConsole(out isCreated);
-                        if (isCreated && _repo.ExistsById(fromConsole.Id))
+                        if (isCreated)
                         {
-                            _repo.Update(fromConsole);
+                            req.Body = fromConsole;
                         }
                         break;
                     }
@@ -71,7 +59,7 @@ namespace ArchLab1.Controller
                         long id = ReadIdFromConsole(out idSucceed);
                         if (idSucceed)
                         {
-                            _repo.DeleteById(id);
+                            req.Body = new TaskEntity(id);
                         }
                         break;
                     }
@@ -81,6 +69,7 @@ namespace ArchLab1.Controller
                         break;
                     }
             }
+            return req;
         }
         public void ShowCommands()
         {

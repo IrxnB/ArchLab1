@@ -1,4 +1,5 @@
-﻿using ArchLab1Lib.Model;
+﻿using ArchLab1Lib;
+using ArchLab1Lib.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -8,12 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="30.0.1" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ArchLab1Lib\ArchLab1Lib.csproj" />
+    <ProjectReference Include="..\ArchLab1\Server.csproj" />
   </ItemGroup>
 
 </Project>
