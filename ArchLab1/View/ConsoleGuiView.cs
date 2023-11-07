@@ -18,20 +18,20 @@ namespace ArchLab1.View
             }
         }
 
-        public void DrawTasks(List<TaskEntity> tasks)
+        public void DrawTasks(List<ArchLab1Lib.Model.TaskEntity> tasks)
         {
             tasks.ForEach(task => DrawTask(task));
         }
-        public void DrawTask(TaskEntity? task)
+        public void DrawTask(ArchLab1Lib.Model.TaskEntity? task)
         {
             if(task != null)
-                Console.WriteLine($"Task: Id={task.Id}, Name={task.Name}," +
+                Console.WriteLine($"TaskEntity: TaskEntityId={task.TaskEntityId}, Name={task.Name}," +
                     $" Desc={task.Description}, Completed={task.IsComplete}");
         }
 
         public void AskForCommand()
         {
-            Console.WriteLine("Enter command Id:");
+            Console.WriteLine("Enter command TaskEntityId:");
         }
         public void AskForField(String fieldName)
         {

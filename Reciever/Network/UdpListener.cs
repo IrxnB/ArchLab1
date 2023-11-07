@@ -27,8 +27,10 @@ namespace Client.Network
                     response = (Response)binaryFormatter.Deserialize(stream);
 
                 }
-                response.strings.ForEach(s => { Console.WriteLine(s); });
-                Thread.Sleep(100);
+                if(response.Status == Status.NOT_OK)
+                {
+                    Console.WriteLine("Wrong request");
+                }else response.strings.ForEach(s => { Console.WriteLine(s); });
             }
         }
         

@@ -26,8 +26,8 @@ namespace Server.View
         }
         private String getTaskString(TaskEntity task)
         {
-            return ($"Task: Id={task.Id}, Name={task.Name}," +
-                $" Desc={task.Description}, Completed={task.IsComplete}");
+            return ($"TaskEntity: TaskEntityId={task.TaskEntityId}, Name={task.Name}," +
+                $" Desc={task.Description}, Completed={task.IsComplete})");
         }
     }
 }

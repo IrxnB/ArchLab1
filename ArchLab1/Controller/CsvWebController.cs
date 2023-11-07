@@ -1,38 +1,40 @@
-﻿using ArchLab1.Holders;
-using ArchLab1.Model;
+﻿using ArchLab1.Model;
 using ArchLab1Lib.Model;
 using ArchLab1Lib;
 using Server.View;
+using Server.Model;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 
 namespace ArchLab1.Controller
 {
     internal class CsvWebController
     {
-        private readonly CsvRepository<TaskEntity, long> _repo;
+        private readonly ArchDbContext _db;
         private readonly WebView _view;
         private static Response NotOkResponse = new Response { Status = Status.NOT_OK };
 
-        public CsvWebController(CsvRepository<TaskEntity, long> repo, WebView view)
+        public CsvWebController(DbContextOptions dbContextOptions, WebView view, ArchDbContext dbContext)
         {
-            _repo = repo;
+            _db = dbContext;
             _view = view;
         }
+
         public Response ProcessCommand(Request request)
         {
-
             switch (request.Command)
             {
                 case Command.GetAll:
                     {
-                        return _view.Tasks(_repo.ReadAll());
+                        return _view.Tasks(_db.Tasks.Select(x => x).ToList());
                     }
                 case Command.GetById:
                     {
-                        if (request.Body.Id == -1)
+                        if (request.Body.TaskEntityId == null)
                         {
                             return NotOkResponse;
                         }
-                        var fromRepo = _repo.ReadById(request.Body.Id);
+                        var fromRepo = _db.Tasks.Find(request.Body.TaskEntityId);
                         if (fromRepo == null)
                         {
                             return NotOkResponse;
@@ -41,35 +43,40 @@ namespace ArchLab1.Controller
                     }
                 case Command.CreateNew:
                     {
-                        if (request.Body.Id != -1 && !_repo.ExistsById(request.Body.Id))
+                        if (request.Body.TaskEntityId == null)
                         {
-                            _repo.Create(request.Body);
+                            _db.Tasks.Add(request.Body);
+                            _db.SaveChanges();
                             return new Response();
                         }
                         return NotOkResponse;
                     }
                 case Command.UpdateById:
                     {
-                        if (_repo.ExistsById(request.Body.Id))
+                        var fromDb = _db.Tasks.Find(request.Body.TaskEntityId);
+                        if (fromDb != null)
                         {
-                            _repo.Update(request.Body);
+                            _db.Tasks.Update(request.Body);
+                            _db.SaveChanges();
                             return new Response();
                         }
                         return NotOkResponse;
                     }
                 case Command.DeleteById:
                     {
-                        
-                        if (request.Body.Id != -1)
+
+                        if (request.Body.TaskEntityId != null)
                         {
-                            _repo.DeleteById(request.Body.Id);
+                            _db.Tasks.Where(task => task.TaskEntityId == request.Body.TaskEntityId).ExecuteDelete();
+                            _db.SaveChanges();
                             return new Response();
                         }
                         return NotOkResponse;
                     }
-                    
+
             }
             return NotOkResponse;
+
         }
 
 

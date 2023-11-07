@@ -17,8 +17,9 @@ namespace Client.Controller
                 .Cast<Command>()
                 .ToList();
         }
-        public Request ProcessCommand(Command command, out bool isExitCommand)
+        public Request ProcessCommand(Command? command, out bool isExitCommand, out bool validInput)
         {
+            validInput = true;
             isExitCommand = false;
             var req = new Request();
             req.Command = command;
@@ -26,18 +27,18 @@ namespace Client.Controller
             {
                 case Command.GetById:
                     {
-                        bool succeed;
-                        long id = ReadIdFromConsole(out succeed);
-                        if(succeed){
-                            req.Body = new TaskEntity(id);
+                        long id = ReadIdFromConsole(out validInput);
+                        if(validInput){
+                            var body = new TaskEntity();
+                            body.TaskEntityId = id;
+                            req.Body = body;
                         }
                         break;
                     }
                 case Command.CreateNew:
                     {
-                        bool isCreated = true;
-                        TaskEntity fromConsole = ReadTaskFromConsole(out isCreated);
-                        if (isCreated)
+                        TaskEntity fromConsole = ReadTaskFromConsole(out validInput);
+                        if (validInput)
                         {
                             req.Body = fromConsole;
                         }
@@ -45,9 +46,8 @@ namespace Client.Controller
                     }
                 case Command.UpdateById:
                     {
-                        bool isCreated = true;
-                        TaskEntity fromConsole = ReadTaskFromConsole(out isCreated);
-                        if (isCreated)
+                        TaskEntity fromConsole = ReadTaskWithIdFromConsole(out validInput);
+                        if (validInput)
                         {
                             req.Body = fromConsole;
                         }
@@ -55,11 +55,12 @@ namespace Client.Controller
                     }
                 case Command.DeleteById:
                     {
-                        bool idSucceed;
-                        long id = ReadIdFromConsole(out idSucceed);
-                        if (idSucceed)
+                        long id = ReadIdFromConsole(out validInput);
+                        if (validInput)
                         {
-                            req.Body = new TaskEntity(id);
+                            var body = new TaskEntity();
+                            body.TaskEntityId = id;
+                            req.Body = body;
                         }
                         break;
                     }
@@ -76,18 +77,31 @@ namespace Client.Controller
             _view.DrawCommands(_commands);
         }
 
-        public Command ReadCommand()
+        public Command? ReadCommand()
         {
             var commandStr = Console.ReadLine() ?? "";
-            var commandInt = int.Parse(commandStr) - 1;
-            var command = (Command)commandInt;
-            return command;
+            Object command = null; 
+            if (!Enum.TryParse(typeof(Command), commandStr, out command))
+            {
+                Console.WriteLine("Wrong Command");
+                return null;
+            }
+            return (Command)command;
         }
 
-        private TaskEntity ReadTaskFromConsole(out bool succeed)
+        private ArchLab1Lib.Model.TaskEntity ReadTaskWithIdFromConsole(out bool succeed)
         {
-            bool idSucceed = false, nameSucceed = false, descSucceed = false, isCompleteSucceed = false;
+            bool idSucceed, readSucceed;
             long id = ReadIdFromConsole(out idSucceed);
+            var task = ReadTaskFromConsole(out readSucceed);
+
+            succeed = idSucceed && readSucceed;
+            task.TaskEntityId = id;
+            return task;
+        }
+        private ArchLab1Lib.Model.TaskEntity ReadTaskFromConsole(out bool succeed)
+        {
+            bool nameSucceed = false, descSucceed = false, isCompleteSucceed = false;
 
             _view.AskForField("name");
             string? name = ReadStringFromConsole(out nameSucceed);
@@ -98,12 +112,12 @@ namespace Client.Controller
             _view.AskForField("is completed");
             bool isComplete = ReadBoolFromConsole(out isCompleteSucceed);
 
-            succeed = idSucceed && nameSucceed && descSucceed && isCompleteSucceed;
-            return new TaskEntity(id, name, description, isComplete);
+            succeed = nameSucceed && descSucceed && isCompleteSucceed;
+            return new TaskEntity { TaskEntityId = null, Name = name, Description = description, IsComplete = isComplete };
         }
         private long ReadIdFromConsole(out bool succeed)
         {
-            _view.AskForField("Id");
+            _view.AskForField("TaskEntityId");
             long id;
             succeed = long.TryParse(Console.ReadLine(), out id);
             return id;

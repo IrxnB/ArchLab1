@@ -11,7 +11,7 @@ namespace ArchLab1Lib
     [Serializable]
     public class Request
     {
-        public Command Command { get; set; }
+        public Command? Command { get; set; }
         public TaskEntity Body { get; set; } = TaskEntity.Empty;
 
     }

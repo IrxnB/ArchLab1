@@ -28,19 +28,28 @@ namespace Client.Network
         public async void StartSending()
         {
             bool isExit = false;
+            bool shouldSendRequest;
 
             do
             {
                 controller.ShowCommands();
 
-                var request = controller.ProcessCommand(controller.ReadCommand(), out isExit);
-                byte[] requsetBytes;
-                using (var stream = new MemoryStream())
+
+                var command = controller.ReadCommand();
+                if(command != null)
                 {
-                    binaryFormatter.Serialize(stream, request);
-                    requsetBytes = stream.ToArray();
+                    var request = controller.ProcessCommand(command, out isExit, out shouldSendRequest);
+                    if (shouldSendRequest)
+                    {
+                        byte[] requsetBytes;
+                        using (var stream = new MemoryStream())
+                        {
+                            binaryFormatter.Serialize(stream, request);
+                            requsetBytes = stream.ToArray();
+                        }
+                        await client.SendAsync(requsetBytes, requsetBytes.Length, serverIp);
+                    }
                 }
-                await client.SendAsync(requsetBytes, requsetBytes.Length, serverIp);
             } while (!isExit);
         }
     }

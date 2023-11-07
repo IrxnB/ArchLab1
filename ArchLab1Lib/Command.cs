@@ -5,7 +5,7 @@ namespace ArchLab1Lib
     [Serializable]
     public enum Command
     {
-        GetAll,
+        GetAll = 1,
         GetById,
         UpdateById,
         CreateNew,

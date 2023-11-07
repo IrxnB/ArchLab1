@@ -9,7 +9,7 @@ namespace Reciever.View
         {
             foreach (Command command in commands)
             {
-                Console.WriteLine($"{(int)command + 1}. {command}");
+                Console.WriteLine($"{(int)command}. {command}");
             }
         }
 
@@ -20,7 +20,7 @@ namespace Reciever.View
 
         public void AskForCommand()
         {
-            Console.WriteLine("Enter command Id:");
+            Console.WriteLine("Enter command TaskEntityId:");
         }
         public void AskForField(String fieldName)
         {

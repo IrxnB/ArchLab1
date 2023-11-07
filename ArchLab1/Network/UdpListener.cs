@@ -1,8 +1,12 @@
 ﻿
 using ArchLab1.Controller;
 using ArchLab1Lib;
+using Azure.Core;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Server;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -11,16 +15,16 @@ namespace ArchLab1.Network
 {
     internal class UdpListener : IHostedService
     {
+        private readonly IServiceProvider serviceProvider;
         private UdpClient udpClient;
         private BinaryFormatter binaryFormatter = new BinaryFormatter();
-        private CsvWebController controller;
         private IPEndPoint clientIp;
         private readonly ILogger<UdpListener> logger;
-        public UdpListener(int port, CsvWebController controller, IPEndPoint clientIp, ILogger<UdpListener> logger) 
+        public UdpListener(IOptions<ServerConfig> serverOps, IOptions<ClientConfig> clientOps, ILogger<UdpListener> logger, IServiceProvider serviceProvider) 
         {
-            this.udpClient = new UdpClient(port);
-            this.controller = controller;
-            this.clientIp = clientIp;
+            this.serviceProvider = serviceProvider;
+            this.udpClient = new UdpClient(serverOps.Value.Port);
+            this.clientIp = new IPEndPoint(IPAddress.Parse(clientOps.Value.Ip), clientOps.Value.Port);
             this.logger = logger;
         }
 
@@ -28,23 +32,27 @@ namespace ArchLab1.Network
         {
             while (true)
             {
-                var result = await udpClient.ReceiveAsync();
-                Request request;
-                using (var stream = new MemoryStream(result.Buffer))
+                using (var scope = serviceProvider.CreateScope())
                 {
-                    request = (Request)binaryFormatter.Deserialize(stream);
-                }
+                    var controller = scope.ServiceProvider.GetService<CsvWebController>();
+                    var result = await udpClient.ReceiveAsync();
+                    ArchLab1Lib.Request request;
+                    using (var stream = new MemoryStream(result.Buffer))
+                    {
+                        request = (ArchLab1Lib.Request)binaryFormatter.Deserialize(stream);
+                    }
 
-                logger.LogInformation($"Requset from {result.RemoteEndPoint}, command: {request.Command}");
-                byte[] responseBytes;
-                var response = controller.ProcessCommand(request);
-                using (var stream = new MemoryStream())
-                {
-                    binaryFormatter.Serialize(stream, response);
-                    responseBytes = stream.ToArray();
+                    logger.LogInformation($"Requset from {result.RemoteEndPoint}, command: {request.Command}");
+                    byte[] responseBytes;
+                    var response = controller.ProcessCommand(request);
+                    using (var stream = new MemoryStream())
+                    {
+                        binaryFormatter.Serialize(stream, response);
+                        responseBytes = stream.ToArray();
+                    }
+                    _ = udpClient.SendAsync(responseBytes, responseBytes.Length, clientIp);
+                    logger.LogInformation($"response sent to {clientIp}");
                 }
-                _ = udpClient.SendAsync(responseBytes, responseBytes.Length, clientIp);
-                logger.LogInformation($"response sent to {clientIp}");
             }
         }
 
